@@ -225,7 +225,7 @@ QPushButton:hover
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="add_button_2">
+            <widget class="QPushButton" name="today_button">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -246,7 +246,7 @@ QPushButton:hover
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="add_button_3">
+            <widget class="QPushButton" name="week_button">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -262,7 +262,7 @@ QPushButton:hover
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="add_button_4">
+            <widget class="QPushButton" name="done_button">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -352,17 +352,23 @@ QPushButton:hover
               <stylestrategy>PreferAntialias</stylestrategy>
              </font>
             </property>
+            <property name="contextMenuPolicy">
+             <enum>Qt::CustomContextMenu</enum>
+            </property>
             <property name="lineWidth">
              <number>0</number>
             </property>
             <property name="text">
-             <string>NAGŁÓWEK</string>
+             <string>DZISIAJ</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::NoTextInteraction</set>
             </property>
            </widget>
           </item>

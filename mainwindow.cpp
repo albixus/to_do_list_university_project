@@ -11,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent) :
     sidebar_anim->setDuration(500);
 
     is_burger_button_clicked=false;
-
 }
 
 MainWindow::~MainWindow()
@@ -26,15 +25,29 @@ void MainWindow::on_burger_button_clicked()
         sidebar_anim->setStartValue(ui->sidebar->minimumSize());
         sidebar_anim->setEndValue(QSize(200,0));
         is_burger_button_clicked=false;
+
     }
     else
     {
         sidebar_anim->setStartValue(ui->sidebar->minimumSize());
         sidebar_anim->setEndValue(QSize(100,0));
         is_burger_button_clicked=true;
+
     }
-
-
         sidebar_anim->start();
+}
 
+void MainWindow::on_today_button_clicked()
+{
+    ui->header->setText("DZISIAJ");
+}
+
+void MainWindow::on_week_button_clicked()
+{
+    ui->header->setText("NASTEPNE 7 DNI");
+}
+
+void MainWindow::on_done_button_clicked()
+{
+    ui->header->setText("WYKONANE ZADANIA");
 }
