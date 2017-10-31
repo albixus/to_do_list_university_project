@@ -15,6 +15,9 @@ public:
     explicit Add(QWidget *parent = 0);
     ~Add();
 
+private slots:
+
+
 private:
     Ui::Add *ui;
 };

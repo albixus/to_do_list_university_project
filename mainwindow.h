@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QPropertyAnimation>
+#include "add.h"
 
 namespace Ui {
 class MainWindow;
@@ -25,10 +26,13 @@ private slots:
 
     void on_done_button_clicked();
 
+    void on_add_button_clicked();
+
 private:
     Ui::MainWindow *ui;
     bool is_burger_button_clicked;
     QPropertyAnimation *sidebar_anim;
+    Ui::Add *add_ui;
 };
 
 #endif // MAINWINDOW_H

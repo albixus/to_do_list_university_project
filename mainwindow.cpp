@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QWidget>
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -9,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     sidebar_anim = new QPropertyAnimation(ui->sidebar,"minimumSize");
     sidebar_anim->setDuration(500);
+
 
     is_burger_button_clicked=false;
 }
@@ -36,6 +38,12 @@ void MainWindow::on_burger_button_clicked()
     }
         sidebar_anim->start();
 }
+void MainWindow::on_add_button_clicked()
+{
+    Add add_dialog;
+    add_dialog.setModal(true);
+    add_dialog.exec();
+}
 
 void MainWindow::on_today_button_clicked()
 {
@@ -44,10 +52,12 @@ void MainWindow::on_today_button_clicked()
 
 void MainWindow::on_week_button_clicked()
 {
-    ui->header->setText("NASTEPNE 7 DNI");
+    ui->header->setText("NASTĘPNE 7 DNI");
 }
 
 void MainWindow::on_done_button_clicked()
 {
     ui->header->setText("WYKONANE ZADANIA");
 }
+
+
