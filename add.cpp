@@ -12,3 +12,8 @@ Add::~Add()
 {
     delete ui;
 }
+
+void Add::on_ok_button_clicked()
+{
+
+}

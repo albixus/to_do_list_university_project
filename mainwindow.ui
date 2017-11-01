@@ -25,7 +25,7 @@
   <property name="styleSheet">
    <string notr="true">#centralWidget
 {
-	background-color:rgb(115, 120, 117);
+	background-color:rgb(166, 166, 166);
 }
 
 QPushButton
@@ -33,7 +33,7 @@ QPushButton
 	background-color:rgb(52, 52, 52);
 	color:white;
 	border:none;
-font-size:12px;
+	font-size:12px;
 }
 
 QPushButton:hover
@@ -48,13 +48,13 @@ QPushButton:hover
 
 #task_area
 {
-    background-color:rgb(115, 120, 117);
+   background-color:rgb(166, 166, 166);
    border:none;
 }
 
 #task_area_content
 {
-	background-color:rgb(148, 153, 150);
+	background-color:rgb(166, 166, 166);
 }
 
 #header

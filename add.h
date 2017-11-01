@@ -18,6 +18,8 @@ public:
 private slots:
 
 
+    void on_ok_button_clicked();
+
 private:
     Ui::Add *ui;
 };
