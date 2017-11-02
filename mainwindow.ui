@@ -28,6 +28,14 @@
 	background-color:rgb(166, 166, 166);
 }
 
+QCheckBox
+{
+	color:black;
+	font-size:12px;
+	background-color:rgba(255, 7, 11, 40);
+	border-radius:5px;
+
+}
 QPushButton
 {
 	background-color:rgb(52, 52, 52);
@@ -386,13 +394,6 @@ QPushButton:hover
             <property name="bottomMargin">
              <number>122</number>
             </property>
-            <item>
-             <widget class="QCheckBox" name="checkBox_2">
-              <property name="text">
-               <string>CheckBox</string>
-              </property>
-             </widget>
-            </item>
            </layout>
           </item>
           <item>

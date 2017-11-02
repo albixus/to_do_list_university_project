@@ -1,7 +1,9 @@
 #ifndef ADD_H
 #define ADD_H
-
 #include <QDialog>
+#include "task.h"
+
+
 
 namespace Ui {
 class Add;
@@ -16,12 +18,16 @@ public:
     ~Add();
 
 private slots:
-
-
     void on_ok_button_clicked();
+
+    void on_cancel_button_clicked();
+
+    void on_calendar_activated(const QDate &date);
 
 private:
     Ui::Add *ui;
+    task tmp_task;
 };
+
 
 #endif // ADD_H

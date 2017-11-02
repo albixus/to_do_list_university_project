@@ -35,7 +35,8 @@
    <string>Dodaj zadanie do wykonania</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">#Add
+   <string notr="true">
+#Add
 {
 	background-color:rgb(166, 166, 166);
 }
@@ -125,6 +126,9 @@ QCalendarWidget QToolButton {
        <property name="styleSheet">
         <string notr="true">
 	background-color:rgb(68, 68, 68);</string>
+       </property>
+       <property name="locale">
+        <locale language="Polish" country="Poland"/>
        </property>
        <property name="firstDayOfWeek">
         <enum>Qt::Monday</enum>
