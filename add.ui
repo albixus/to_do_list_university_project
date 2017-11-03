@@ -34,6 +34,10 @@
   <property name="windowTitle">
    <string>Dodaj zadanie do wykonania</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resource.qrc">
+    <normaloff>:/images/img/plus_black.png</normaloff>:/images/img/plus_black.png</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true">
 #Add
@@ -142,6 +146,9 @@ QCalendarWidget QToolButton {
        <property name="verticalHeaderFormat">
         <enum>QCalendarWidget::ISOWeekNumbers</enum>
        </property>
+       <property name="dateEditEnabled">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>
@@ -166,7 +173,7 @@ QCalendarWidget QToolButton {
         <number>10</number>
        </property>
        <property name="topMargin">
-        <number>16</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
         <number>10</number>
@@ -280,6 +287,8 @@ QCalendarWidget QToolButton {
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
  <connections/>
 </ui>

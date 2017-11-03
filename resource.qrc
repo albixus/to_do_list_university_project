@@ -1,5 +1,11 @@
 <RCC>
     <qresource prefix="/images">
         <file>img/burger.png</file>
+        <file>img/7days.png</file>
+        <file>img/checkmark.png</file>
+        <file>img/plus.png</file>
+        <file>img/to_do_list.png</file>
+        <file>img/today.png</file>
+        <file>img/plus_black.png</file>
     </qresource>
 </RCC>

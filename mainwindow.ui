@@ -22,20 +22,16 @@
   <property name="windowTitle">
    <string>Lista to do</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resource.qrc">
+    <normaloff>:/images/img/to_do_list.png</normaloff>:/images/img/to_do_list.png</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true">#centralWidget
 {
 	background-color:rgb(166, 166, 166);
 }
 
-QCheckBox
-{
-	color:black;
-	font-size:12px;
-	background-color:rgba(255, 7, 11, 40);
-	border-radius:5px;
-
-}
 QPushButton
 {
 	background-color:rgb(52, 52, 52);
@@ -146,7 +142,7 @@ QPushButton:hover
          <item>
           <layout class="QVBoxLayout" name="sidebar_layout">
            <property name="spacing">
-            <number>1</number>
+            <number>5</number>
            </property>
            <property name="topMargin">
             <number>0</number>
@@ -305,6 +301,12 @@ QPushButton:hover
       </item>
       <item>
        <widget class="QScrollArea" name="task_area">
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOn</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAsNeeded</enum>
+        </property>
         <property name="widgetResizable">
          <bool>true</bool>
         </property>
@@ -313,7 +315,7 @@ QPushButton:hover
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>590</width>
+           <width>576</width>
            <height>496</height>
           </rect>
          </property>

@@ -34,6 +34,7 @@ private:
     bool is_burger_button_clicked;
     QPropertyAnimation *sidebar_anim;
     Ui::Add *add_ui;
+
 };
 
 #endif // MAINWINDOW_H

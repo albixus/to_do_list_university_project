@@ -16,7 +16,7 @@ public:
     void set_date(QDate date);
     void set_priority(int priority);
     void set_text(QString text);
-    void set_check_box(int x,int y,QWidget *parent=nullptr,int width=1000,int height=30);
+    void set_check_box(int x,int y,QWidget *parent=nullptr,int width=2000,int height=30);
     QString get_text() { return text;}
 private:
     QDate date;

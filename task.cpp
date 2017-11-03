@@ -34,17 +34,40 @@ void task::set_text(QString text)
 void task::set_check_box(int x,int y,QWidget *parent,int width,int height)
 {
     check_box = new QCheckBox(parent);
-    check_box->setGeometry(parent->geometry().top()+50+x,y,width,height);
-    check_box->setStyleSheet("border-radius:5px;"
+    check_box->setGeometry(parent->geometry().left()+50+x,y,5000,height);
+    check_box->setStyleSheet(" QCheckBox{"
+                             "border-radius:5px;"
                             "font-size:12px;"
-                            "color:black;");
+                            "color:black;}"
+                             "QCheckBox:hover{"
+                             "background-color: rgba(12, 202, 9,30);}");
+    check_box->setMinimumWidth(5000);
+    check_box->setCursor(Qt::PointingHandCursor);
 
-    check_box->setText(date.day()+":"+date.month()+text);
+
+    check_box->setText(" "+QString::number(date.day())+"/"+QString::number(date.month())+"/"+QString::number(date.year())+"    "+text);
+    check_box->setVisible(true);
 
     if(priority==1)
-        check_box->setStyleSheet("background-color: rgba(55, 145, 193, 30);");
+        check_box->setStyleSheet("QCheckBox{"
+                                 "background-color: rgba(55, 145, 193, 30);"
+                                 "border-radius:5px;"
+                                 "font-size:12px;}"
+                                 "QCheckBox:hover{"
+                                 "background-color: rgba(12, 202, 9,30);}"
+                                );
     if(priority==2)
-        check_box->setStyleSheet("background-color: rgba(189, 124, 71, 30) ;");
+        check_box->setStyleSheet("QCheckBox{"
+                                 "background-color: rgba(189, 124, 71, 30) ;"
+                                 "border-radius:5px;"
+                                 "font-size:12px;}"
+                                 "QCheckBox:hover{"
+                                 "background-color: rgba(12, 202, 9,30);}");
     if(priority==3)
-        check_box->setStyleSheet("background-color: rgba(255, 7, 11, 40);");
+        check_box->setStyleSheet("QCheckBox{"
+                                 "background-color: rgba(255, 7, 11, 40);"
+                                 "border-radius:5px;"
+                                 "font-size:12px;}"
+                                 "QCheckBox:hover{"
+                                 "background-color: rgba(12, 202, 9,30);}");
 }
