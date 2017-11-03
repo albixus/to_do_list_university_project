@@ -30,9 +30,5 @@ void Add::on_cancel_button_clicked()
     Add::close();
 }
 
-void Add::on_calendar_activated(const QDate &date)
-{
-
-}
 
 

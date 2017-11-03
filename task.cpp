@@ -13,6 +13,9 @@ task::task()
     date=QDate(2017,1,1);
     priority=0;
     text=QString("");
+    context_menu = new QMenu();
+    context_menu->addAction("Edytuj");
+    context_menu->addAction("Usuń");
 }
 void task::set_date(QDate date)
 {
