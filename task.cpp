@@ -1,13 +1,8 @@
 #include "task.h"
 
+
 std::vector<task> task_vector;
 
-task::task(QDate date,int priority,QString text)
-{
-    this->date=date;
-    this->priority=priority;
-    this->text=text;
-}
 task::task()
 {
     date=QDate(2017,1,1);
@@ -17,6 +12,7 @@ task::task()
     context_menu->addAction("Edytuj");
     context_menu->addAction("Usuń");
 }
+
 void task::set_date(QDate date)
 {
     this->date=date;
@@ -37,7 +33,7 @@ void task::set_text(QString text)
 void task::set_check_box(int x,int y,QWidget *parent,int width,int height)
 {
     check_box = new QCheckBox(parent);
-    check_box->setGeometry(parent->geometry().left()+50+x,y,5000,height);
+    check_box->setGeometry(parent->geometry().left()+50+x,y,width+4000,height);
     check_box->setStyleSheet(" QCheckBox{"
                              "border-radius:5px;"
                             "font-size:12px;"

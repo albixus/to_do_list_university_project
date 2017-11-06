@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>792</width>
-    <height>498</height>
+    <width>983</width>
+    <height>568</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -71,6 +71,11 @@ QPushButton:hover
 {
 	background-color:rgb(52, 52, 52);
 	border:none;
+}
+
+#task_list
+{
+	background-color:rgb(166, 166, 166);
 }
 
 </string>
@@ -282,6 +287,38 @@ QPushButton:hover
             </widget>
            </item>
            <item>
+            <widget class="QPushButton" name="overdue_button">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
+             </property>
+             <property name="text">
+              <string>ZALEGŁE</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="stat_button">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
+             </property>
+             <property name="text">
+              <string>STATYSTYKI</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <spacer name="verticalSpacer">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -315,8 +352,8 @@ QPushButton:hover
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>576</width>
-           <height>496</height>
+           <width>767</width>
+           <height>566</height>
           </rect>
          </property>
          <property name="minimumSize">
@@ -326,6 +363,9 @@ QPushButton:hover
           </size>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="spacing">
+           <number>0</number>
+          </property>
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -383,33 +423,35 @@ QPushButton:hover
            </widget>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="tasks">
-            <property name="spacing">
-             <number>22</number>
-            </property>
-            <property name="leftMargin">
-             <number>20</number>
-            </property>
-            <property name="topMargin">
-             <number>20</number>
-            </property>
-            <property name="bottomMargin">
-             <number>122</number>
-            </property>
-           </layout>
-          </item>
-          <item>
-           <spacer name="verticalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
+           <widget class="QListWidget" name="task_list">
+            <property name="sizeIncrement">
              <size>
-              <width>20</width>
-              <height>40</height>
+              <width>0</width>
+              <height>0</height>
              </size>
             </property>
-           </spacer>
+            <property name="font">
+             <font>
+              <family>Verdana</family>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+            <property name="cursor" stdset="0">
+             <cursorShape>ArrowCursor</cursorShape>
+            </property>
+            <property name="contextMenuPolicy">
+             <enum>Qt::CustomContextMenu</enum>
+            </property>
+            <property name="spacing">
+             <number>5</number>
+            </property>
+            <property name="viewMode">
+             <enum>QListView::ListMode</enum>
+            </property>
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
