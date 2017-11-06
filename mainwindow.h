@@ -39,15 +39,20 @@ private:
     bool is_burger_button_clicked;
     QPropertyAnimation *sidebar_anim;
     Ui::Add *add_ui;
-    std::vector<QListWidgetItem*> list_items;
     void get_today_tasks(std::string filename);
+    void save_tasks_from_vectors(std::string filename);
+    void get_done_tasks(std::string filename);
+    void save_done_tasks(std::string filename);
+    void get_next_week_tasks(std::string filename);
 
     std::vector<QListWidgetItem*> item;
 
     std::vector<std::string> today;
     std::vector<std::string> next_week;
-    std::vector<std::string> done;
+    std::vector<std::string> rest;
     std::vector<std::string> overdue;
+
+    std::vector<std::string> done;
 };
 
 #endif // MAINWINDOW_H
