@@ -10,5 +10,6 @@
         <file>img/past.png</file>
         <file>img/statistics.png</file>
         <file>img/all.png</file>
+        <file>img/query.png</file>
     </qresource>
 </RCC>

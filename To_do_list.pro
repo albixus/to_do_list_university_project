@@ -26,14 +26,20 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp\
         mainwindow.cpp \
     add.cpp \
-    task.cpp
+    task.cpp \
+    accept.cpp \
+    stats.cpp
 
 HEADERS  += mainwindow.h \
     add.h \
-    task.h
+    task.h \
+    accept.h \
+    stats.h
 
 FORMS    += mainwindow.ui \
-    add.ui
+    add.ui \
+    accept.ui \
+    stats.ui
 
 DISTFILES +=
 

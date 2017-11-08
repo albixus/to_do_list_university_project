@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
+#include "accept.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -12,8 +12,11 @@ MainWindow::MainWindow(QWidget *parent) :
     get_today_tasks("all_tasks.tsk");
     get_done_tasks("done_tasks.tsk");
     get_next_week_tasks("all_tasks.tsk");
+    get_rest_tasks("all_tasks.tsk");
+    get_overdue_tasks("all_tasks.tsk");
 
-
+    ui->no_task->setHidden(true);
+    ui->clear_button->setHidden(true);
     for(size_t i = 0; i < today.size();i++)
     {
         item.push_back(new QListWidgetItem(QString::fromUtf8(today.at(i).c_str())));
@@ -22,8 +25,12 @@ MainWindow::MainWindow(QWidget *parent) :
         item.at(i)->setCheckState(Qt::Unchecked);
     }
     ui->task_list->sortItems(Qt::SortOrder::DescendingOrder);
+    current=TODAY;
 
+    if(overdue.size()>0)
+        QMessageBox::about(this,"Zaległości","Masz zaległe zadania. Sprawdź to!");
 
+    check_emptiness(today);
     is_burger_button_clicked=false;
 }
 
@@ -95,16 +102,40 @@ void MainWindow::on_add_button_clicked()
     Add add_dialog;
     add_dialog.setModal(false);
     add_dialog.exec();
+
+    switch(current)
+    {
+        case TODAY:
+            on_today_button_clicked();
+            break;
+
+        case NEXT_WEEK:
+            on_week_button_clicked();
+            break;
+
+        case REST:
+           on_all_button_clicked();
+            break;
+
+        case OVERDUE:
+            on_overdue_button_clicked();
+            break;
+
+        case DONE:
+            break;
+    }
 }
 
 void MainWindow::on_today_button_clicked()
 {
+    current=TODAY;
     ui->task_list->clear();
     today.clear();
     item.clear();
 
     ui->header->setText("DZISIAJ");
     get_today_tasks("all_tasks.tsk");
+    ui->clear_button->setHidden(true);
 
     for(size_t i = 0; i < today.size();i++)
     {
@@ -113,15 +144,19 @@ void MainWindow::on_today_button_clicked()
         item.at(i)->setFlags(item.at(i)->flags()|Qt::ItemIsUserCheckable);
         item.at(i)->setCheckState(Qt::Unchecked);
     }
+
+    check_emptiness(today);
 }
 
 void MainWindow::on_week_button_clicked()
 {
+    current=NEXT_WEEK;
     ui->header->setText("NASTĘPNE 7 DNI");
     ui->task_list->clear();
     next_week.clear();
     item.clear();
     get_next_week_tasks("all_tasks.tsk");
+    ui->clear_button->setHidden(true);
 
     for(size_t i = 0; i < next_week.size();i++)
     {
@@ -130,19 +165,77 @@ void MainWindow::on_week_button_clicked()
         item.at(i)->setFlags(item.at(i)->flags()|Qt::ItemIsUserCheckable);
         item.at(i)->setCheckState(Qt::Unchecked);
     }
+    check_emptiness(next_week);
 }
 
 void MainWindow::on_done_button_clicked()
 {
+    current=DONE;
     ui->header->setText("WYKONANE ZADANIA");
     ui->task_list->clear();
+    done.clear();
     item.clear();
+    get_done_tasks("done_tasks.tsk");
+    if(done.size()==0)
+        ui->clear_button->setHidden(true);
+    else
+        ui->clear_button->setHidden(false);
+
 
     for(size_t i = 0; i < done.size();i++)
     {
         item.push_back(new QListWidgetItem(QString::fromUtf8(done.at(i).c_str())));
         ui->task_list->addItem(item.at(i));
     }
+    check_emptiness(done);
+}
+
+void MainWindow::on_all_button_clicked()
+{
+    current=REST;
+    ui->header->setText("POZOSTAŁE");
+    ui->task_list->clear();
+    rest.clear();
+    item.clear();
+    get_rest_tasks("all_tasks.tsk");
+    ui->clear_button->setHidden(true);
+
+    for(size_t i = 0; i < rest.size();i++)
+    {
+        item.push_back(new QListWidgetItem(QString::fromUtf8(rest.at(i).c_str())));
+        ui->task_list->addItem(item.at(i));
+        item.at(i)->setFlags(item.at(i)->flags()|Qt::ItemIsUserCheckable);
+        item.at(i)->setCheckState(Qt::Unchecked);
+    }
+   check_emptiness(rest);
+}
+
+void MainWindow::on_overdue_button_clicked()
+{
+    current=OVERDUE;
+    ui->header->setText("ZALEGŁE");
+    ui->task_list->clear();
+    overdue.clear();
+    item.clear();
+    get_overdue_tasks("all_tasks.tsk");
+    ui->clear_button->setHidden(true);
+
+    for(size_t i = 0; i < overdue.size();i++)
+    {
+        item.push_back(new QListWidgetItem(QString::fromUtf8(overdue.at(i).c_str())));
+        ui->task_list->addItem(item.at(i));
+        item.at(i)->setFlags(item.at(i)->flags()|Qt::ItemIsUserCheckable);
+        item.at(i)->setCheckState(Qt::Unchecked);
+    }
+    check_emptiness(overdue);
+}
+
+void MainWindow::check_emptiness(const std::vector<std::string> &vec)
+{
+    if(vec.size()==0)
+        ui->no_task->setHidden(false);
+    else
+        ui->no_task->setHidden(true);
 }
 
 void MainWindow::on_task_list_itemChanged(QListWidgetItem *item)
@@ -161,6 +254,7 @@ void MainWindow::on_task_list_itemChanged(QListWidgetItem *item)
                     get_done_tasks("done_tasks.tsk");
                     today.erase(today.begin()+i);
                     save_tasks_from_vectors("all_tasks.tsk");
+                    check_emptiness(today);
 
                     break;
                 }
@@ -173,6 +267,31 @@ void MainWindow::on_task_list_itemChanged(QListWidgetItem *item)
                     get_done_tasks("done_tasks.tsk");
                     next_week.erase(next_week.begin()+i);
                     save_tasks_from_vectors("all_tasks.tsk");
+                    check_emptiness(next_week);
+                    break;
+                }
+            for(size_t i= 0; i<rest.size();i++)
+                if(text==rest.at(i))
+                {
+                    done.push_back(rest.at(i));
+                    save_done_tasks("done_tasks.tsk");
+                    done.clear();
+                    get_done_tasks("done_tasks.tsk");
+                    rest.erase(rest.begin()+i);
+                    save_tasks_from_vectors("all_tasks.tsk");
+                    check_emptiness(rest);
+                    break;
+                }
+            for(size_t i= 0; i<overdue.size();i++)
+                if(text==overdue.at(i))
+                {
+                    done.push_back(overdue.at(i));
+                    save_done_tasks("done_tasks.tsk");
+                    done.clear();
+                    get_done_tasks("done_tasks.tsk");
+                    overdue.erase(rest.begin()+i);
+                    save_tasks_from_vectors("all_tasks.tsk");
+                    check_emptiness(overdue);
                     break;
                 }
 
@@ -312,4 +431,101 @@ void MainWindow::get_next_week_tasks(std::string filename)
         QMessageBox::about(this,"ERROR","Cannot open file");
 
     file.close();
+}
+
+void MainWindow::get_rest_tasks(std::string filename)
+{
+    std::fstream file;
+    QDate date = QDate::currentDate();
+    std::string date_buffer;
+    std::string buffer;
+    int day,month,year;
+    size_t pos;
+
+    file.open(filename,std::ios::in);
+    if(file.is_open())
+    {
+        while(!file.eof())
+        {
+            std::getline(file,buffer);
+            if(buffer=="")
+                break;
+             date_buffer=buffer.substr(13,buffer.find_first_of(" "));
+
+             pos=date_buffer.find_first_of("/");
+             day=std::atoi(date_buffer.substr(0,pos).c_str());
+
+             date_buffer.erase(0,pos+1);
+             pos=date_buffer.find_first_of("/");
+
+             month=std::atoi(date_buffer.substr(0,pos).c_str());
+             date_buffer.erase(0,pos+1);
+
+             year=std::atoi(date_buffer.c_str());
+
+             QDate task_date(year,month,day);
+
+             if((date.daysTo(task_date)>7))
+             {
+                 rest.push_back(buffer);
+             }
+        }
+
+    }
+}
+
+void MainWindow::get_overdue_tasks(std::string filename)
+{
+    std::fstream file;
+    QDate date = QDate::currentDate();
+    std::string date_buffer;
+    std::string buffer;
+    int day,month,year;
+    size_t pos;
+
+    file.open(filename,std::ios::in);
+    if(file.is_open())
+    {
+        while(!file.eof())
+        {
+            std::getline(file,buffer);
+            if(buffer=="")
+                break;
+             date_buffer=buffer.substr(13,buffer.find_first_of(" "));
+
+             pos=date_buffer.find_first_of("/");
+             day=std::atoi(date_buffer.substr(0,pos).c_str());
+
+             date_buffer.erase(0,pos+1);
+             pos=date_buffer.find_first_of("/");
+
+             month=std::atoi(date_buffer.substr(0,pos).c_str());
+             date_buffer.erase(0,pos+1);
+
+             year=std::atoi(date_buffer.c_str());
+
+             QDate task_date(year,month,day);
+
+             if((date.daysTo(task_date)<0))
+             {
+                 overdue.push_back(buffer);
+             }
+        }
+
+    }
+}
+
+void MainWindow::on_clear_button_clicked()
+{
+    accept yes_or_no;
+    yes_or_no.setModal(false);
+    int status = yes_or_no.exec();//exec() return Dialog Code
+
+    if( status == 1)//1 = accepted 0=rejected
+    {
+        std::fstream file;
+        file.open("done_tasks.tsk",std::ios::out |std::ios::trunc);
+        file.close();
+        on_done_button_clicked();
+    }
 }

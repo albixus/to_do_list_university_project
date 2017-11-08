@@ -32,6 +32,15 @@
 	background-color:rgb(166, 166, 166);
 }
 
+#clear_button
+{
+	background-color:	rgb(140, 39, 8);	
+}
+#clear_button:hover
+{
+	background-color:	rgb(160, 59, 28);	
+}
+
 QPushButton
 {
 	background-color:rgb(52, 52, 52);
@@ -77,6 +86,12 @@ QPushButton:hover
 {
 	background-color:rgb(166, 166, 166);
 }
+
+#no_task
+{
+	color:rgba(36, 36, 36, 80);
+}
+
 
 </string>
   </property>
@@ -266,7 +281,7 @@ QPushButton:hover
               <cursorShape>PointingHandCursor</cursorShape>
              </property>
              <property name="text">
-              <string>NASTĘPNE 7 DNI</string>
+              <string>NASTĘPNY TYDZIEŃ</string>
              </property>
             </widget>
            </item>
@@ -282,7 +297,7 @@ QPushButton:hover
               <cursorShape>PointingHandCursor</cursorShape>
              </property>
              <property name="text">
-              <string>WSZYSTKIE</string>
+              <string>POZOSTAŁE</string>
              </property>
             </widget>
            </item>
@@ -347,6 +362,22 @@ QPushButton:hover
              </property>
             </spacer>
            </item>
+           <item>
+            <widget class="QPushButton" name="clear_button">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
+             </property>
+             <property name="text">
+              <string>WYCZYŚĆ</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </item>
         </layout>
@@ -368,8 +399,8 @@ QPushButton:hover
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>781</width>
-           <height>566</height>
+           <width>767</width>
+           <height>567</height>
           </rect>
          </property>
          <property name="minimumSize">
@@ -439,6 +470,51 @@ QPushButton:hover
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="no_task">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <family>Tahoma</family>
+              <pointsize>16</pointsize>
+              <weight>50</weight>
+              <bold>false</bold>
+              <underline>false</underline>
+              <strikeout>false</strikeout>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="lineWidth">
+             <number>0</number>
+            </property>
+            <property name="text">
+             <string>BRAK ZADAŃ W TEJ ZAKŁADCE</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+            <property name="margin">
+             <number>150</number>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::NoTextInteraction</set>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QListWidget" name="task_list">
             <property name="sizeIncrement">
              <size>
@@ -457,6 +533,9 @@ QPushButton:hover
             </property>
             <property name="contextMenuPolicy">
              <enum>Qt::CustomContextMenu</enum>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
             </property>
             <property name="spacing">
              <number>5</number>

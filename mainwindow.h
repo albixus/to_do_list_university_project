@@ -8,6 +8,7 @@
 #include <vector>
 #include <QWidget>
 #include <QListWidgetItem>
+#include "accept.h"
 
 namespace Ui {
 class MainWindow;
@@ -34,6 +35,12 @@ private slots:
 
     void on_task_list_itemChanged(QListWidgetItem *item);
 
+    void on_all_button_clicked();
+
+    void on_overdue_button_clicked();
+
+    void on_clear_button_clicked();
+
 private:
     Ui::MainWindow *ui;
     bool is_burger_button_clicked;
@@ -44,15 +51,20 @@ private:
     void get_done_tasks(std::string filename);
     void save_done_tasks(std::string filename);
     void get_next_week_tasks(std::string filename);
+    void get_rest_tasks(std::string filename);
+    void get_overdue_tasks(std::string filename);
+
+    void check_emptiness(const std::vector<std::string> &vec);
 
     std::vector<QListWidgetItem*> item;
-
     std::vector<std::string> today;
     std::vector<std::string> next_week;
     std::vector<std::string> rest;
     std::vector<std::string> overdue;
 
     std::vector<std::string> done;
+
+    enum current_state {TODAY,NEXT_WEEK,REST,OVERDUE,DONE}current;
 };
 
 #endif // MAINWINDOW_H
