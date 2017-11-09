@@ -9,7 +9,6 @@ Add::Add(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->calendar->setSelectedDate(QDate::currentDate());
-
 }
 
 Add::~Add()
