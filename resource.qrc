@@ -7,5 +7,14 @@
         <file>img/to_do_list.png</file>
         <file>img/today.png</file>
         <file>img/plus_black.png</file>
+        <file>img/past.png</file>
+        <file>img/statistics.png</file>
+        <file>img/all.png</file>
+        <file>img/query.png</file>
+        <file>img/statistics2.png</file>
+        <file>img/best_medal.png</file>
+        <file>img/medal1.png</file>
+        <file>img/medal2.png</file>
+        <file>img/medal3.png</file>
     </qresource>
 </RCC>

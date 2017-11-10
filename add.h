@@ -2,8 +2,7 @@
 #define ADD_H
 #include <QDialog>
 #include "task.h"
-
-
+#include <fstream>
 
 namespace Ui {
 class Add;
@@ -25,8 +24,11 @@ private slots:
     void on_calendar_activated(const QDate &date);
 
 private:
+    std::fstream file;
+
     Ui::Add *ui;
     task tmp_task;
+    void write_to_file(std::string filename);
 };
 
 
