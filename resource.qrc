@@ -12,5 +12,9 @@
         <file>img/all.png</file>
         <file>img/query.png</file>
         <file>img/statistics2.png</file>
+        <file>img/best_medal.png</file>
+        <file>img/medal1.png</file>
+        <file>img/medal2.png</file>
+        <file>img/medal3.png</file>
     </qresource>
 </RCC>

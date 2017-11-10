@@ -168,7 +168,7 @@ QPushButton:hover
          <item>
           <layout class="QVBoxLayout" name="sidebar_layout">
            <property name="spacing">
-            <number>0</number>
+            <number>10</number>
            </property>
            <property name="topMargin">
             <number>0</number>

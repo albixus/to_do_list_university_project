@@ -3,6 +3,7 @@
 #include "accept.h"
 
 int points;
+int task_done_all;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -108,33 +109,20 @@ void MainWindow::on_add_button_clicked()
     add_dialog.setModal(false);
     add_dialog.exec();
 
-    switch(current)
-    {
-        case TODAY:
-            on_today_button_clicked();
-            break;
+    next_week.clear();
+    get_next_week_tasks("all_tasks.tsk");
 
-        case NEXT_WEEK:
-            on_week_button_clicked();
-            break;
+    today.clear();
+    get_today_tasks("all_tasks.tsk");
 
-        case REST:
-           on_all_button_clicked();
-            break;
+    rest.clear();
+    get_rest_tasks("all_tasks.tsk");
 
-        case OVERDUE:
-            on_overdue_button_clicked();
-            break;
-
-        case DONE:
-            break;
-    }
     if(!is_burger_button_clicked)
     {
         ui->today_button->setText("DZISIAJ ("+QString::number(today.size())+")");
         ui->all_button->setText("POZOSTAŁE ("+QString::number(rest.size())+")");
         ui->week_button->setText("NASTĘPNY TYDZIEŃ ("+QString::number(next_week.size())+")");
-        ui->overdue_button->setText("ZALEGŁE ("+QString::number(overdue.size())+")");
     }
 }
 
@@ -338,7 +326,7 @@ void MainWindow::on_task_list_itemChanged(QListWidgetItem *item)
                     points+=10;
                     break;
                 }
-
+            task_done_all++;
             ui->rank_label->setText("Twoje Punkty:  "+QString::number(points));
     }
     if(!is_burger_button_clicked)
@@ -354,9 +342,10 @@ void MainWindow::get_today_tasks(std::string filename)
 {
     std::fstream file;
     QDate date = QDate::currentDate();
-    std::string string_date= QString(QString::number(date.day())+"/"+QString::number(date.month())+"/"+QString::number(date.year())).toStdString();
-    std::string buffer;
     std::string date_buffer;
+    std::string buffer;
+    int day,month,year;
+    size_t pos;
 
     file.open(filename,std::ios::in);
     if(file.is_open())
@@ -366,11 +355,25 @@ void MainWindow::get_today_tasks(std::string filename)
             std::getline(file,buffer);
             if(buffer=="")
                 break;
-            date_buffer=buffer.substr(13,buffer.find_first_of(" ")-1);//get only date from file then compare it with current date if they are the same add to vector
-            if(date_buffer==string_date)
-            {
-                today.push_back(buffer);
-            }
+             date_buffer=buffer.substr(13,buffer.find_first_of(" "));
+
+             pos=date_buffer.find_first_of("/");
+             day=std::atoi(date_buffer.substr(0,pos).c_str());
+
+             date_buffer.erase(0,pos+1);
+             pos=date_buffer.find_first_of("/");
+
+             month=std::atoi(date_buffer.substr(0,pos).c_str());
+             date_buffer.erase(0,pos+1);
+
+             year=std::atoi(date_buffer.c_str());
+
+             QDate task_date(year,month,day);
+
+             if((date.daysTo(task_date)==0))
+             {
+                 today.push_back(buffer);
+             }
         }
     }
     else
@@ -575,6 +578,7 @@ void MainWindow::on_clear_button_clicked()
 
     if( status == 1)//1 = accepted 0=rejected
     {
+        task_done_all = done.size();
         std::fstream file;
         file.open("done_tasks.tsk",std::ios::out |std::ios::trunc);
         file.close();
@@ -656,6 +660,9 @@ void MainWindow::get_points_from_file(std::__cxx11::string filename)
     {
         std::getline(file,buffer);
         points=std::atoi(buffer.c_str());
+
+        std::getline(file,buffer);
+        task_done_all=std::atoi(buffer.c_str());
     }
     file.close();
 }
@@ -668,13 +675,15 @@ void MainWindow::save_points_to_file(std::__cxx11::string filename)
 
     if(file.is_open())
     {
-        file<<std::to_string(points);
+        file<<std::to_string(points)<<std::endl;
+        file<<std::to_string(task_done_all)<<std::endl;
+        file<<std::to_string(today.size()+next_week.size()+rest.size()+overdue.size())<<std::endl;
     }
 }
 
 void MainWindow::on_stat_button_clicked()
 {
+    save_points_to_file("stats.tsk");
     Stats *stat = new Stats;
-
     stat->show();
 }
