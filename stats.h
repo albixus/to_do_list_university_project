@@ -18,10 +18,12 @@ public:
 
 private:
     Ui::Stats *ui;
-    void get_stats_from_file(std::string filename);
+
     int points;
     int done_tasks;
     int to_do;
+
+    void get_stats_from_file(std::string filename);
 };
 
 #endif // STATS_H

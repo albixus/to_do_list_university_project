@@ -24,10 +24,10 @@ private slots:
     void on_calendar_activated(const QDate &date);
 
 private:
-    std::fstream file;
-
     Ui::Add *ui;
     task tmp_task;
+    std::fstream file;
+
     void write_to_file(std::string filename);
 };
 

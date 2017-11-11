@@ -24,10 +24,8 @@ private:
     QDate date;
     int priority;
     QString text;
-    QCheckBox *check_box;
-    QMenu *context_menu;
 };
 
-extern std::vector<task> task_vector;
+
 
 #endif // TASK_H

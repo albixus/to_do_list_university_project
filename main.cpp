@@ -1,7 +1,5 @@
 #include "mainwindow.h"
 #include <QApplication>
-#include "task.h"
-#include <vector>
 
 int main(int argc, char *argv[])
 {

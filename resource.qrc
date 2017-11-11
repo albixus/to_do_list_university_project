@@ -16,5 +16,9 @@
         <file>img/medal1.png</file>
         <file>img/medal2.png</file>
         <file>img/medal3.png</file>
+        <file>img/to_do_list.ico</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>icon.rc</file>
     </qresource>
 </RCC>
