@@ -376,8 +376,6 @@ void MainWindow::get_today_tasks(std::string filename)
              }
         }
     }
-    else
-        QMessageBox::about(this,"ERROR","Cannot open file");
 
     file.close();
 }
@@ -483,7 +481,6 @@ void MainWindow::get_next_week_tasks(std::string filename)
         }
     }
     else
-        QMessageBox::about(this,"ERROR","Cannot open file");
 
     file.close();
 }
