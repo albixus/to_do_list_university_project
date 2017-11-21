@@ -21,4 +21,7 @@
     <qresource prefix="/">
         <file>icon.rc</file>
     </qresource>
+    <qresource prefix="/database">
+        <file>to_do_list.sqlite</file>
+    </qresource>
 </RCC>

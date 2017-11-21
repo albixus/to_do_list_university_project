@@ -9,6 +9,8 @@ Add::Add(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->calendar->setSelectedDate(QDate::currentDate());
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("D:/Projekty/to_do_list_university_project/to_do_list.sqlite");
 }
 
 Add::~Add()
@@ -33,7 +35,23 @@ void Add::on_ok_button_clicked()
         tmp_task.set_priority(ui->priority_spinBox->value());
         tmp_task.set_text(ui->add_task->text());
         tmp_task.set_date(ui->calendar->selectedDate());
-        write_to_file("all_tasks.tsk");
+
+        if(db.open())
+        {
+            QSqlQuery query;
+            if(query.exec("INSERT INTO tasks (Priority,Data,Text) "
+                        "VALUES(" + QString::number(ui->priority_spinBox->value()) +  ",'" + ui->calendar->selectedDate().toString("yyyy-MM-dd")+ "','"+ui->add_task->text()+"')"))
+            {
+               ;
+            }
+            else
+                QMessageBox::about(this,"title","Blad przy dodawaniu zdania do bazy");
+            db.close();
+        }
+        else
+            QMessageBox::about(this,"ERROR","add.cpp Nie otwarto bazy");
+        QSqlDatabase::removeDatabase("D:/Projekty/to_do_list_university_project/to_do_list.sqlite");
+
         Add::close();
 }
 

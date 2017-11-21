@@ -12,6 +12,8 @@
 #include "task.h"
 #include "accept.h"
 #include "stats.h"
+#include <QtSql/QSqlDatabase>
+#include <QtSql>
 
 namespace Ui {
 class MainWindow;
@@ -65,16 +67,16 @@ private:
     std::vector<std::string> overdue;
     std::vector<std::string> done;
 
+    QSqlDatabase db;
+
+
     enum current_state {TODAY,NEXT_WEEK,REST,OVERDUE,DONE}current;
 
     bool is_burger_button_clicked;
 
     ///getting diffrent tasks
-    void get_today_tasks(std::string filename);  
-    void get_done_tasks(std::string filename);
-    void get_next_week_tasks(std::string filename);
-    void get_rest_tasks(std::string filename);
-    void get_overdue_tasks(std::string filename);
+    void get_tasks(enum current_state);
+
 
     ///writing and reading stats from file
     void get_points_from_file(std::string filename);
@@ -87,6 +89,8 @@ private:
     int check_priority(std::string str);
     void set_color_by_priority(QListWidgetItem *item,int priority);
     void check_emptiness(const std::vector<std::string> &vec);  
+
+    void set_items(std::vector<std::string> &vec);
 };
 
 #endif // MAINWINDOW_H
