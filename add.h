@@ -1,10 +1,10 @@
 #ifndef ADD_H
 #define ADD_H
 #include <QDialog>
-#include "task.h"
 #include <fstream>
 #include <QtSql>
 #include <QtSql/QSqlDatabase>
+#include <QMessageBox>
 
 namespace Ui {
 class Add;
@@ -27,11 +27,7 @@ private slots:
 
 private:
     Ui::Add *ui;
-    task tmp_task;
-    std::fstream file;
     QSqlDatabase db;
-    QSqlQuery query;
-    void write_to_file(std::string filename);
 };
 
 

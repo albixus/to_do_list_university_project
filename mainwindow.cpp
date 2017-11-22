@@ -17,11 +17,6 @@ MainWindow::MainWindow(QWidget *parent) :
     db.setDatabaseName("D:/Projekty/to_do_list_university_project/to_do_list.sqlite");
     db.open();
 
-   /* get_done_tasks("done_tasks.tsk");
-    get_next_week_tasks("all_tasks.tsk");
-    get_rest_tasks("all_tasks.tsk");
-    get_overdue_tasks("all_tasks.tsk");
-*/
     get_points_from_file("stats.tsk");
 
     if(overdue.size()>0)
@@ -34,11 +29,12 @@ MainWindow::MainWindow(QWidget *parent) :
     on_today_button_clicked();
     ui->task_list->sortItems(Qt::SortOrder::DescendingOrder);
 
-    current=TODAY;
-    check_emptiness(today);
-    get_tasks(current);
+    get_tasks(NEXT_WEEK);
+    get_tasks(OVERDUE);
+    get_tasks(REST);
 
     ui->rank_label->setText("Twoje Punkty: "+QString::number(points));
+
     ui->today_button->setText("DZISIAJ ("+QString::number(today.size())+")");
     ui->all_button->setText("POZOSTAŁE ("+QString::number(rest.size())+")");
     ui->week_button->setText("NASTĘPNY TYDZIEŃ ("+QString::number(next_week.size())+")");
@@ -48,6 +44,9 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     save_points_to_file("stats.tsk");
+    db.close();
+    QSqlDatabase::removeDatabase("D:/Projekty/to_do_list_university_project/to_do_list.sqlite");
+
     delete ui;
 }
 
@@ -142,11 +141,6 @@ void MainWindow::on_add_button_clicked()
         break;
     }
 
-    next_week.clear();
-    today.clear();
-    rest.clear();
-    //get_tasks(current);
-
     if(!is_burger_button_clicked)
     {
         ui->today_button->setText("DZISIAJ ("+QString::number(today.size())+")");
@@ -213,17 +207,12 @@ void MainWindow::on_done_button_clicked()
     current=DONE;
     ui->header->setText("WYKONANE ZADANIA");
 
-    ui->task_list->clear();
-    done.clear();
-    item.clear();
-
     set_items(done);
 
     if(done.size()==0)
         ui->clear_button->setHidden(true);
     else
         ui->clear_button->setHidden(false);
-
 }
 
 void MainWindow::on_all_button_clicked()
@@ -255,8 +244,10 @@ void MainWindow::on_task_list_itemChanged(QListWidgetItem *item)
                 }
 
             std::string text = item->text().toStdString();
+            text.erase(0,11);
 
             for(size_t i= 0; i<today.size();i++)
+            {
                 if(text==today.at(i))
                 {
                     today.erase(today.begin()+i);
@@ -264,16 +255,12 @@ void MainWindow::on_task_list_itemChanged(QListWidgetItem *item)
                     points+=30;
                     break;
                 }
+            }
             for(size_t i= 0; i<next_week.size();i++)
                 if(text==next_week.at(i))
                 {
-                    done.push_back(next_week.at(i));
-                    //save_done_tasks("done_tasks.tsk");
-                    done.clear();
-                    //get_done_tasks("done_tasks.tsk");
 
                     next_week.erase(next_week.begin()+i);
-                    //save_tasks_from_vectors("all_tasks.tsk");
                     check_emptiness(next_week);
                     points+=50;
                     break;
@@ -281,13 +268,7 @@ void MainWindow::on_task_list_itemChanged(QListWidgetItem *item)
             for(size_t i= 0; i<rest.size();i++)
                 if(text==rest.at(i))
                 {
-                    done.push_back(rest.at(i));
-                    //save_done_tasks("done_tasks.tsk");
-                    done.clear();
-                    //get_done_tasks("done_tasks.tsk");
-
                     rest.erase(rest.begin()+i);
-                    //save_tasks_from_vectors("all_tasks.tsk");
                     check_emptiness(rest);
                     points+=100;
                     break;
@@ -295,20 +276,16 @@ void MainWindow::on_task_list_itemChanged(QListWidgetItem *item)
             for(size_t i= 0; i<overdue.size();i++)
                 if(text==overdue.at(i))
                 {
-                    done.push_back(overdue.at(i));
-                    //save_done_tasks("done_tasks.tsk");
-                    done.clear();
-                    //get_done_tasks("done_tasks.tsk");
-
-                    overdue.erase(rest.begin()+i);
-                    //save_tasks_from_vectors("all_tasks.tsk");
+                    overdue.erase(overdue.begin()+i);
                     check_emptiness(overdue);
                     points+=10;
                     break;
                 }
+
             task_done_all++;
             ui->rank_label->setText("Twoje Punkty:  "+QString::number(points));
     }
+
     if(!is_burger_button_clicked)
     {
         ui->today_button->setText("DZISIAJ ("+QString::number(today.size())+")");
@@ -326,38 +303,74 @@ void MainWindow::on_clear_button_clicked()
 
     if( status == 1)//1 = accepted 0=rejected
     {
-        task_done_all = done.size();
-        std::fstream file;
-        file.open("done_tasks.tsk",std::ios::out |std::ios::trunc);
-        file.close();
-        on_done_button_clicked();
+       QSqlQuery query;
+       if(!query.exec("DELETE  FROM tasks WHERE Is_Done = 1;"))
+            QMessageBox::about(this,"Błąd","Błąd zapytania do bazy!");
+
+       on_done_button_clicked();
     }
 }
 
 void MainWindow::on_task_list_customContextMenuRequested(const QPoint &pos)
 {
     //handle global position
-    QPoint global_pos = ui->task_list->mapToGlobal(pos);
+    if(current!=DONE)
+    {
+        QPoint global_pos = ui->task_list->mapToGlobal(pos);
 
-    QMenu menu;
-    menu.addAction("Usuń",this,SLOT(eraseItem()));
+        QMenu menu;
+        menu.addAction("Usuń",this,SLOT(eraseItem()));
+        menu.addAction("Edytuj Priorytet",this,SLOT(on_priority_edit()));
+        menu.addAction("Edytuj Date",this,SLOT(on_date_edit()));
+        menu.addAction("Edytuj Treść",this,SLOT(on_text_edit()));
 
-    menu.exec(global_pos);
-    eraseItem();
+        menu.exec(global_pos);
+
+        current_state tmp_current = current;
+        on_today_button_clicked();
+        on_week_button_clicked();
+        on_all_button_clicked();
+
+        switch(tmp_current)
+        {
+        case TODAY:
+            on_today_button_clicked();
+            break;
+        case NEXT_WEEK:
+            on_week_button_clicked();
+            break;
+        case REST:
+            on_all_button_clicked();
+            break;
+        case OVERDUE:
+            break;
+        case DONE:
+            break;
+        }
+    }
 }
 
 void MainWindow::eraseItem()
 {
    for(int i=0; i<ui->task_list->selectedItems().size();i++)
-    {
+   {
+
         //get current item on selected row
         QListWidgetItem *item = ui->task_list->takeItem(ui->task_list->currentRow());
+
+        QSqlQuery query;
+        if(!query.exec("DELETE FROM tasks WHERE ID_Task = "+item->data(Qt::UserRole).toString()+";"))
+        {
+            QMessageBox::about(this,"Błąd","Błąd zapytania do bazy");
+        }
+
         std::string text = item->text().toStdString();
+        text.erase(0,10);
 
         for(size_t i= 0; i<today.size();i++)
             if(text==today.at(i))
-            {today.erase(today.begin()+i);
-             //   save_tasks_from_vectors("all_tasks.tsk");
+            {
+                today.erase(today.begin()+i);
                 check_emptiness(today);
                 break;
             }
@@ -365,7 +378,6 @@ void MainWindow::eraseItem()
             if(text==next_week.at(i))
             {
                 next_week.erase(next_week.begin()+i);
-                //save_tasks_from_vectors("all_tasks.tsk");
                 check_emptiness(next_week);
                 break;
             }
@@ -373,7 +385,6 @@ void MainWindow::eraseItem()
             if(text==rest.at(i))
             {
                 rest.erase(rest.begin()+i);
-               // save_tasks_from_vectors("all_tasks.tsk");
                 check_emptiness(rest);
                 break;
             }
@@ -381,12 +392,11 @@ void MainWindow::eraseItem()
             if(text==overdue.at(i))
             {
                 overdue.erase(rest.begin()+i);
-              //  save_tasks_from_vectors("all_tasks.tsk");
                 check_emptiness(overdue);
                 break;
             }
         delete item;
-    }
+   }
    if(!is_burger_button_clicked)
    {
        ui->today_button->setText("DZISIAJ ("+QString::number(today.size())+")");
@@ -403,10 +413,103 @@ void MainWindow::on_stat_button_clicked()
     stat->show();
 }
 
+void MainWindow::on_priority_edit()
+{
+    for(int i=0; i<ui->task_list->selectedItems().size();i++)
+     {
+        //get current item on selected row
+        QListWidgetItem *item = ui->task_list->item(ui->task_list->currentRow());
+
+        Edit_priority dialog;
+        dialog.setModal(false);
+        dialog.exec();
+
+            int priority = dialog.get_priority();
+            if(priority != -1)
+            {
+                QSqlQuery query;
+                if(!query.exec("UPDATE tasks SET Priority ="+QString::number(priority)+" WHERE ID_Task ="+item->data(Qt::UserRole).toString()+";"))
+                    QMessageBox::about(this,"Błąd","Błąd zapytania do bazy priority edit");
+            }
+
+    }
+}
+
+void MainWindow::on_date_edit()
+{
+    for(int i=0; i<ui->task_list->selectedItems().size();i++)
+     {
+        //get current item on selected row
+        QListWidgetItem *item = ui->task_list->item(ui->task_list->currentRow());
+
+       edit_date dialog;
+       dialog.setModal(false);
+       dialog.exec();
+
+       QDate edited_date = dialog.get_date();
+
+       if(edited_date.year()!=1000)
+       {
+            QSqlQuery query;
+            if(!query.exec("UPDATE tasks SET Data = '"+ edited_date.toString("yyyy-MM-dd")+
+                           "' WHERE ID_Task = "+item->data(Qt::UserRole).toString()+";"))
+                QMessageBox::about(this,"Błąd","Błąd zapytania do bazy date edit");
+       }
+       std::string text = item->text().toStdString();
+       text.erase(0,11);
+
+       for(size_t i= 0; i<today.size();i++)
+       {
+           if(text==today.at(i))
+           {
+               today.erase(today.begin()+i);
+               check_emptiness(today);
+               points+=30;
+               break;
+           }
+       }
+       for(size_t i= 0; i<next_week.size();i++)
+           if(text==next_week.at(i))
+           {
+
+               next_week.erase(next_week.begin()+i);
+               check_emptiness(next_week);
+               points+=50;
+               break;
+           }
+       for(size_t i= 0; i<rest.size();i++)
+           if(text==rest.at(i))
+           {
+               rest.erase(rest.begin()+i);
+               check_emptiness(rest);
+               points+=100;
+               break;
+           }
+       for(size_t i= 0; i<overdue.size();i++)
+           if(text==overdue.at(i))
+           {
+               overdue.erase(overdue.begin()+i);
+               check_emptiness(overdue);
+               points+=10;
+               break;
+           }
+     }
+}
+
+void MainWindow::on_text_edit()
+{
+    for(int i=0; i<ui->task_list->selectedItems().size();i++)
+     {
+        //get current item on selected row
+        QListWidgetItem *item = ui->task_list->item(ui->task_list->currentRow());
+
+
+     }
+}
+
 //READING FROM FILES SECTION/////////////////////////////////////////////
 void MainWindow::get_tasks(enum current_state current)
 {
-
         QSqlQuery query;
         if(current == TODAY)
         {

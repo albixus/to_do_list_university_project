@@ -5,6 +5,9 @@
 #include <QPropertyAnimation>
 #include <QListWidgetItem>
 #include <QKeyEvent>
+#include <QtSql/QSqlDatabase>
+#include <QtSql>
+#include <QMenu>
 
 #include <vector>
 
@@ -12,8 +15,8 @@
 #include "task.h"
 #include "accept.h"
 #include "stats.h"
-#include <QtSql/QSqlDatabase>
-#include <QtSql>
+#include "edit_priority.h"
+#include "edit_date.h"
 
 namespace Ui {
 class MainWindow;
@@ -26,6 +29,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    QListWidgetItem editable_item;
 private slots:
     void on_burger_button_clicked();
 
@@ -51,6 +55,11 @@ private slots:
 
     void on_stat_button_clicked();
 
+    void on_priority_edit();
+
+    void on_date_edit();
+
+    void on_text_edit();
 protected:
     void keyPressEvent(QKeyEvent *key);
 
@@ -69,7 +78,6 @@ private:
 
     QSqlDatabase db;
 
-
     enum current_state {TODAY,NEXT_WEEK,REST,OVERDUE,DONE}current;
 
     bool is_burger_button_clicked;
@@ -77,14 +85,9 @@ private:
     ///getting diffrent tasks
     void get_tasks(enum current_state);
 
-
     ///writing and reading stats from file
     void get_points_from_file(std::string filename);
     void save_points_to_file(std::string filename);
-
-    ///saving tasks to file
-    void save_done_tasks(std::string filename);
-    void save_tasks_from_vectors(std::string filename);
 
     int check_priority(std::string str);
     void set_color_by_priority(QListWidgetItem *item,int priority);
