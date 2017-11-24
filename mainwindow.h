@@ -8,6 +8,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql>
 #include <QMenu>
+#include <QSystemTrayIcon>
 
 #include <vector>
 
@@ -17,6 +18,7 @@
 #include "stats.h"
 #include "edit_priority.h"
 #include "edit_date.h"
+#include "edit_text.h"
 
 namespace Ui {
 class MainWindow;
@@ -60,6 +62,11 @@ private slots:
     void on_date_edit();
 
     void on_text_edit();
+
+    void on_show();
+
+    void iconActivated(QSystemTrayIcon::ActivationReason reason);
+
 protected:
     void keyPressEvent(QKeyEvent *key);
 
@@ -76,11 +83,20 @@ private:
     std::vector<std::string> overdue;
     std::vector<std::string> done;
 
+    QMenu *trayIconMenu;
+    QAction *maximizeAction;
+    QAction *minimizeAction;
+    QAction *showAction;
+    QAction *quitAction;
+
     QSqlDatabase db;
+    QSystemTrayIcon *trayIcon;
 
     enum current_state {TODAY,NEXT_WEEK,REST,OVERDUE,DONE}current;
 
     bool is_burger_button_clicked;
+
+    void initialize_tray();
 
     ///getting diffrent tasks
     void get_tasks(enum current_state);
@@ -92,8 +108,12 @@ private:
     int check_priority(std::string str);
     void set_color_by_priority(QListWidgetItem *item,int priority);
     void check_emptiness(const std::vector<std::string> &vec);  
-
+    void update_vectors(std::string text, bool with_points);
     void set_items(std::vector<std::string> &vec);
+    void changeEvent(QEvent* event);
+
+
+
 };
 
 #endif // MAINWINDOW_H

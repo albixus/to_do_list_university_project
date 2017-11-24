@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "accept.h"
+#include <QSettings>
 
 int points;
 int task_done_all;
@@ -10,6 +11,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    initialize_tray();
+
     sidebar_anim = new QPropertyAnimation(ui->sidebar,"minimumSize");
     sidebar_anim->setDuration(500);
 
@@ -51,6 +55,25 @@ MainWindow::~MainWindow()
 }
 
 //SLOTS SECTION/////////////////////////////////////////////////////////
+
+void MainWindow::on_show()
+{
+    this->showNormal();
+    this->setWindowState(Qt::WindowActive);
+}
+
+void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    switch(reason)
+    {
+    case QSystemTrayIcon::DoubleClick:
+        on_show();
+        break;
+    default:
+        break;
+    }
+}
+
 void MainWindow::on_burger_button_clicked()
 {
     ui->add_button->setIcon(QIcon(":/images/img/plus.png"));
@@ -129,15 +152,14 @@ void MainWindow::on_add_button_clicked()
     case NEXT_WEEK:
         on_week_button_clicked();
         break;
-
     case REST:
         on_all_button_clicked();
         break;
-
     case OVERDUE:
+        on_today_button_clicked();
         break;
-
     case DONE:
+        on_today_button_clicked();
         break;
     }
 
@@ -156,42 +178,13 @@ void MainWindow::on_today_button_clicked()
     ui->clear_button->setHidden(true);
 
     set_items(today);
-}
-
-void MainWindow::set_items(std::vector<std::string> &vec)
-{
-    ui->task_list->clear();
-    vec.clear();
-    item.clear();
-    get_tasks(current);
-
-    for(size_t i = 0; i < vec.size();i++)
+    if(!is_burger_button_clicked)
     {
-        std::string item_text = vec.at(i);
-        int id = std::atoi(item_text.substr(0,2).c_str());
-        item_text.erase(0,2);
+        ui->today_button->setText("DZISIAJ ("+QString::number(today.size())+")");
+        ui->all_button->setText("POZOSTAŁE ("+QString::number(rest.size())+")");
+        ui->week_button->setText("NASTĘPNY TYDZIEŃ ("+QString::number(next_week.size())+")");
+    }
 
-        item_text = "Priorytet: " + item_text;
-        QVariant id_data(id);
-        item.push_back(new QListWidgetItem(QString::fromUtf8(item_text.c_str())));
-
-        //setting primary key as data to every ListWidgetItem
-        item.at(i)->setData(Qt::UserRole,id_data);
-
-        ui->task_list->addItem(item.at(i));
-        if(current!=DONE)
-        {
-            item.at(i)->setFlags(item.at(i)->flags()|Qt::ItemIsUserCheckable);
-            item.at(i)->setCheckState(Qt::Unchecked);
-        }
-
-        vec.at(i).erase(0,2);
-
-        int priority = check_priority(item_text);
-        set_color_by_priority(item.at(i),priority);
-     }
-
-    check_emptiness(vec);
 }
 
 void MainWindow::on_week_button_clicked()
@@ -243,55 +236,7 @@ void MainWindow::on_task_list_itemChanged(QListWidgetItem *item)
                     QMessageBox::about(this,"Błąd","Błąd zapytania do bazy");
                 }
 
-            std::string text = item->text().toStdString();
-            text.erase(0,11);
-
-            for(size_t i= 0; i<today.size();i++)
-            {
-                if(text==today.at(i))
-                {
-                    today.erase(today.begin()+i);
-                    check_emptiness(today);
-                    points+=30;
-                    break;
-                }
-            }
-            for(size_t i= 0; i<next_week.size();i++)
-                if(text==next_week.at(i))
-                {
-
-                    next_week.erase(next_week.begin()+i);
-                    check_emptiness(next_week);
-                    points+=50;
-                    break;
-                }
-            for(size_t i= 0; i<rest.size();i++)
-                if(text==rest.at(i))
-                {
-                    rest.erase(rest.begin()+i);
-                    check_emptiness(rest);
-                    points+=100;
-                    break;
-                }
-            for(size_t i= 0; i<overdue.size();i++)
-                if(text==overdue.at(i))
-                {
-                    overdue.erase(overdue.begin()+i);
-                    check_emptiness(overdue);
-                    points+=10;
-                    break;
-                }
-
-            task_done_all++;
-            ui->rank_label->setText("Twoje Punkty:  "+QString::number(points));
-    }
-
-    if(!is_burger_button_clicked)
-    {
-        ui->today_button->setText("DZISIAJ ("+QString::number(today.size())+")");
-        ui->all_button->setText("POZOSTAŁE ("+QString::number(rest.size())+")");
-        ui->week_button->setText("NASTĘPNY TYDZIEŃ ("+QString::number(next_week.size())+")");
-        ui->overdue_button->setText("ZALEGŁE ("+QString::number(overdue.size())+")");
+            update_vectors(item->text().toStdString(),true);
     }
 }
 
@@ -317,9 +262,11 @@ void MainWindow::on_task_list_customContextMenuRequested(const QPoint &pos)
     if(current!=DONE)
     {
         QPoint global_pos = ui->task_list->mapToGlobal(pos);
+        QAction erase;
 
         QMenu menu;
         menu.addAction("Usuń",this,SLOT(eraseItem()));
+        menu.addSeparator();
         menu.addAction("Edytuj Priorytet",this,SLOT(on_priority_edit()));
         menu.addAction("Edytuj Date",this,SLOT(on_date_edit()));
         menu.addAction("Edytuj Treść",this,SLOT(on_text_edit()));
@@ -364,45 +311,7 @@ void MainWindow::eraseItem()
             QMessageBox::about(this,"Błąd","Błąd zapytania do bazy");
         }
 
-        std::string text = item->text().toStdString();
-        text.erase(0,10);
-
-        for(size_t i= 0; i<today.size();i++)
-            if(text==today.at(i))
-            {
-                today.erase(today.begin()+i);
-                check_emptiness(today);
-                break;
-            }
-        for(size_t i= 0; i<next_week.size();i++)
-            if(text==next_week.at(i))
-            {
-                next_week.erase(next_week.begin()+i);
-                check_emptiness(next_week);
-                break;
-            }
-        for(size_t i= 0; i<rest.size();i++)
-            if(text==rest.at(i))
-            {
-                rest.erase(rest.begin()+i);
-                check_emptiness(rest);
-                break;
-            }
-        for(size_t i= 0; i<overdue.size();i++)
-            if(text==overdue.at(i))
-            {
-                overdue.erase(rest.begin()+i);
-                check_emptiness(overdue);
-                break;
-            }
-        delete item;
-   }
-   if(!is_burger_button_clicked)
-   {
-       ui->today_button->setText("DZISIAJ ("+QString::number(today.size())+")");
-       ui->all_button->setText("POZOSTAŁE ("+QString::number(rest.size())+")");
-       ui->week_button->setText("NASTĘPNY TYDZIEŃ ("+QString::number(next_week.size())+")");
-       ui->overdue_button->setText("ZALEGŁE ("+QString::number(overdue.size())+")");
+        update_vectors(item->text().toStdString(),false);
    }
 }
 
@@ -455,44 +364,8 @@ void MainWindow::on_date_edit()
                            "' WHERE ID_Task = "+item->data(Qt::UserRole).toString()+";"))
                 QMessageBox::about(this,"Błąd","Błąd zapytania do bazy date edit");
        }
-       std::string text = item->text().toStdString();
-       text.erase(0,11);
 
-       for(size_t i= 0; i<today.size();i++)
-       {
-           if(text==today.at(i))
-           {
-               today.erase(today.begin()+i);
-               check_emptiness(today);
-               points+=30;
-               break;
-           }
-       }
-       for(size_t i= 0; i<next_week.size();i++)
-           if(text==next_week.at(i))
-           {
-
-               next_week.erase(next_week.begin()+i);
-               check_emptiness(next_week);
-               points+=50;
-               break;
-           }
-       for(size_t i= 0; i<rest.size();i++)
-           if(text==rest.at(i))
-           {
-               rest.erase(rest.begin()+i);
-               check_emptiness(rest);
-               points+=100;
-               break;
-           }
-       for(size_t i= 0; i<overdue.size();i++)
-           if(text==overdue.at(i))
-           {
-               overdue.erase(overdue.begin()+i);
-               check_emptiness(overdue);
-               points+=10;
-               break;
-           }
+       update_vectors(item->text().toStdString().c_str(),false);
      }
 }
 
@@ -503,11 +376,26 @@ void MainWindow::on_text_edit()
         //get current item on selected row
         QListWidgetItem *item = ui->task_list->item(ui->task_list->currentRow());
 
+        Edit_text dialog;
+        dialog.setModal(false);
+        std::string tmp_text = item->text().toStdString();
+        tmp_text.erase(0,25);
+        dialog.set_data(QString::fromUtf8(tmp_text.c_str()));
+        dialog.exec();
 
-     }
+        QString text = dialog.get_text();
+
+        if(text!="")
+        {
+            QSqlQuery query;
+            if(!query.exec("UPDATE tasks SET text = '" + text + "' WHERE ID_Task = "+item->data(Qt::UserRole).toString()+";"))
+                QMessageBox::about(this,"Błąd","Błąd zapytania do bazy date edit");
+        }
+    }
 }
 
-//READING FROM FILES SECTION/////////////////////////////////////////////
+//READING FROM FILES AND DATABASE SECTION/////////////////////////////////////////////
+
 void MainWindow::get_tasks(enum current_state current)
 {
         QSqlQuery query;
@@ -614,7 +502,7 @@ void MainWindow::save_points_to_file(std::__cxx11::string filename)
 //OTHER METHODS/////////////////////////////////////////////////////////
 int MainWindow::check_priority(std::string str)
 {
-    return std::atoi(str.substr(11,1).c_str());
+    return std::atoi(str.substr(10,2).c_str());
 }
 
 void MainWindow::set_color_by_priority(QListWidgetItem *item, int priority)
@@ -635,8 +523,164 @@ void MainWindow::check_emptiness(const std::vector<std::string> &vec)
         ui->no_task->setHidden(true);
 }
 
+void MainWindow::update_vectors(std::string text, bool with_points)
+{
+    text.erase(0,11);
+
+    for(size_t i= 0; i<today.size();i++)
+    {
+        if(text==today.at(i))
+        {
+            today.erase(today.begin()+i);
+            check_emptiness(today);
+            if(with_points)
+                points+=20;
+            break;
+        }
+    }
+    for(size_t i= 0; i<next_week.size();i++)
+        if(text==next_week.at(i))
+        {
+            next_week.erase(next_week.begin()+i);
+            check_emptiness(next_week);
+            if(with_points)
+                points+=50;
+            break;
+        }
+    for(size_t i= 0; i<rest.size();i++)
+        if(text==rest.at(i))
+        {
+            rest.erase(rest.begin()+i);
+            check_emptiness(rest);
+            if(with_points)
+                points+=100;
+            break;
+        }
+    for(size_t i= 0; i<overdue.size();i++)
+        if(text==overdue.at(i))
+        {
+            overdue.erase(overdue.begin()+i);
+            check_emptiness(overdue);
+            if(with_points)
+                points+=10;
+            break;
+        }
+
+    ui->rank_label->setText("Twoje Punkty: "+QString::number(points));
+
+    if(!is_burger_button_clicked)
+    {
+        ui->today_button->setText("DZISIAJ ("+QString::number(today.size())+")");
+        ui->all_button->setText("POZOSTAŁE ("+QString::number(rest.size())+")");
+        ui->week_button->setText("NASTĘPNY TYDZIEŃ ("+QString::number(next_week.size())+")");
+        ui->overdue_button->setText("ZALEGŁE ("+QString::number(overdue.size())+")");
+    }
+}
+
 void MainWindow::keyPressEvent(QKeyEvent *key)
 {
     if(key->key() == Qt::Key_Return)
         on_add_button_clicked();
+}
+
+void MainWindow::initialize_tray()
+{
+    //setting tray icon
+    if(QSystemTrayIcon::isSystemTrayAvailable() == false)
+        QMessageBox::critical(this,"Błąd","Tray icon nie jest dostępny na tym komputerze");
+
+    minimizeAction = new QAction(tr("Mi&nimalizuj"),this);
+    connect(minimizeAction, SIGNAL(triggered(bool)),this,SLOT(showMinimized()));
+
+    maximizeAction = new QAction(tr("Ma&ksymalizuj"),this);
+    connect(maximizeAction,SIGNAL(triggered(bool)),this,SLOT(showMaximized()));
+
+    showAction = new QAction(tr("&Wyświetl"),this);
+    connect(showAction,SIGNAL(triggered(bool)),this,SLOT(on_show()));
+
+    quitAction = new QAction(tr("&Zakończ"),this);
+    connect(quitAction,SIGNAL(triggered(bool)),this,SLOT(close()));
+
+    //adding actions to tray context menu
+    trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(minimizeAction);
+    trayIconMenu->addAction(maximizeAction);
+    trayIconMenu->addAction(showAction);
+    trayIconMenu->addSeparator();
+    trayIconMenu->addAction(quitAction);
+
+    //setting tray on our mainwindow
+    trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setContextMenu(trayIconMenu);
+
+    //connecting events
+    connect(trayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),this,SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
+
+    //setting icon
+    trayIcon->setIcon(this->windowIcon());
+    trayIcon->show();
+
+}
+
+void MainWindow::set_items(std::vector<std::string> &vec)
+{
+    ui->task_list->clear();
+    vec.clear();
+    item.clear();
+    get_tasks(current);
+
+    for(size_t i = 0; i < vec.size();i++)
+    {
+        std::string item_text = vec.at(i);
+        int id = std::atoi(item_text.substr(0,2).c_str());
+        item_text.erase(0,2);
+
+        item_text = "Priorytet: " + item_text;
+        QVariant id_data(id);
+        item.push_back(new QListWidgetItem(QString::fromUtf8(item_text.c_str())));
+
+        //setting primary key as data to every ListWidgetItem
+        item.at(i)->setData(Qt::UserRole,id_data);
+
+        ui->task_list->addItem(item.at(i));
+        if(current!=DONE)
+        {
+            item.at(i)->setFlags(item.at(i)->flags()|Qt::ItemIsUserCheckable);
+            item.at(i)->setCheckState(Qt::Unchecked);
+        }
+
+        vec.at(i).erase(0,2);
+
+        int priority = check_priority(item_text);
+        set_color_by_priority(item.at(i),priority);
+     }
+
+    check_emptiness(vec);
+
+    if(!is_burger_button_clicked)
+    {
+        ui->today_button->setText("DZISIAJ ("+QString::number(today.size())+")");
+        ui->all_button->setText("POZOSTAŁE ("+QString::number(rest.size())+")");
+        ui->week_button->setText("NASTĘPNY TYDZIEŃ ("+QString::number(next_week.size())+")");
+        ui->overdue_button->setText("ZALEGŁE ("+QString::number(overdue.size())+")");
+    }
+}
+
+void MainWindow::changeEvent(QEvent* e)
+{
+    switch (e->type())
+    {
+        case QEvent::WindowStateChange:
+            {
+                if (this->windowState() & Qt::WindowMinimized)
+                {
+                    this->hide();
+                }
+                break;
+            }
+        default:
+            break;
+    }
+
+    QMainWindow::changeEvent(e);
 }

@@ -30,21 +30,24 @@ SOURCES += main.cpp\
     accept.cpp \
     stats.cpp \
     edit_priority.cpp \
-    edit_date.cpp
+    edit_date.cpp \
+    edit_text.cpp
 
 HEADERS  += mainwindow.h \
     add.h \
     accept.h \
     stats.h \
     edit_priority.h \
-    edit_date.h
+    edit_date.h \
+    edit_text.h
 
 FORMS    += mainwindow.ui \
     add.ui \
     accept.ui \
     stats.ui \
     edit_priority.ui \
-    edit_date.ui
+    edit_date.ui \
+    edit_text.ui
 
 DISTFILES +=
 
