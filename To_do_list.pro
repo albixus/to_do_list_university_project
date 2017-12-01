@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT += sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -26,20 +27,27 @@ RC_FILE = icon.rc
 SOURCES += main.cpp\
         mainwindow.cpp \
     add.cpp \
-    task.cpp \
     accept.cpp \
-    stats.cpp
+    stats.cpp \
+    edit_priority.cpp \
+    edit_date.cpp \
+    edit_text.cpp
 
 HEADERS  += mainwindow.h \
     add.h \
-    task.h \
     accept.h \
-    stats.h
+    stats.h \
+    edit_priority.h \
+    edit_date.h \
+    edit_text.h
 
 FORMS    += mainwindow.ui \
     add.ui \
     accept.ui \
-    stats.ui
+    stats.ui \
+    edit_priority.ui \
+    edit_date.ui \
+    edit_text.ui
 
 DISTFILES +=
 
