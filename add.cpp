@@ -10,7 +10,8 @@ Add::Add(QWidget *parent) :
     ui->setupUi(this);
     ui->calendar->setSelectedDate(QDate::currentDate());
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("D:/Projekty/to_do_list_university_project/to_do_list.sqlite");
+
+    db.setDatabaseName(qApp->applicationDirPath()+"/to_do_list.sqlite");
 }
 
 Add::~Add()
@@ -45,7 +46,7 @@ void Add::on_ok_button_clicked()
         else
             QMessageBox::about(this,"ERROR","add.cpp Nie otwarto bazy");
 
-        QSqlDatabase::removeDatabase("D:/Projekty/to_do_list_university_project/to_do_list.sqlite");
+        QSqlDatabase::removeDatabase(qApp->applicationDirPath()+"/to_do_list.sqlite");
         Add::close();
 }
 

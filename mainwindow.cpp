@@ -13,13 +13,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     initialize_tray();
-
+   QMessageBox::about(this,"ssS",qApp->applicationDirPath());
     sidebar_anim = new QPropertyAnimation(ui->sidebar,"minimumSize");
     sidebar_anim->setDuration(500);
 
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("D:/Projekty/to_do_list_university_project/to_do_list.sqlite");
-    db.open();
+    db.setDatabaseName(qApp->applicationDirPath()+"/to_do_list.sqlite");
+    if(db.open())
+    {
+        QSqlQuery query;
+        if(!query.exec("CREATE TABLE tasks ("))
+
+    }
 
     get_points_from_file("stats.tsk");
 
@@ -39,18 +44,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->rank_label->setText("Twoje Punkty: "+QString::number(points));
 
-    ui->today_button->setText("DZISIAJ ("+QString::number(today.size())+")");
-    ui->all_button->setText("POZOSTAŁE ("+QString::number(rest.size())+")");
-    ui->week_button->setText("NASTĘPNY TYDZIEŃ ("+QString::number(next_week.size())+")");
-    ui->overdue_button->setText("ZALEGŁE ("+QString::number(overdue.size())+")");
+    set_number_in_sidebar();
 }
 
 MainWindow::~MainWindow()
 {
     save_points_to_file("stats.tsk");
     db.close();
-    QSqlDatabase::removeDatabase("D:/Projekty/to_do_list_university_project/to_do_list.sqlite");
-
+    QSqlDatabase::removeDatabase(qApp->applicationDirPath()+"/to_do_list.sqlite");
     delete ui;
 }
 
@@ -135,14 +136,24 @@ void MainWindow::on_burger_button_clicked()
 void MainWindow::on_add_button_clicked()
 {
     db.close();
-    QSqlDatabase::removeDatabase("D:/Projekty/to_do_list_university_project/to_do_list.sqlite");
+
+    QSqlDatabase::removeDatabase(qApp->applicationDirPath()+"/to_do_list.sqlite");
     Add add_dialog;
     add_dialog.setModal(false);
     add_dialog.exec();
 
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("D:/Projekty/to_do_list_university_project/to_do_list.sqlite");
+    db.setDatabaseName(qApp->applicationDirPath()+"/to_do_list.sqlite");
+
     db.open();
+
+    current_state tmp=current;
+        on_today_button_clicked();
+        on_week_button_clicked();
+        on_all_button_clicked();
+        on_overdue_button_clicked();
+        on_done_button_clicked();
+    current=tmp;
 
     switch(current)
     {
@@ -156,19 +167,14 @@ void MainWindow::on_add_button_clicked()
         on_all_button_clicked();
         break;
     case OVERDUE:
-        on_today_button_clicked();
+        on_overdue_button_clicked();
         break;
     case DONE:
-        on_today_button_clicked();
+        on_done_button_clicked();
         break;
     }
 
-    if(!is_burger_button_clicked)
-    {
-        ui->today_button->setText("DZISIAJ ("+QString::number(today.size())+")");
-        ui->all_button->setText("POZOSTAŁE ("+QString::number(rest.size())+")");
-        ui->week_button->setText("NASTĘPNY TYDZIEŃ ("+QString::number(next_week.size())+")");
-    }
+    set_number_in_sidebar();
 }
 
 void MainWindow::on_today_button_clicked()
@@ -178,12 +184,7 @@ void MainWindow::on_today_button_clicked()
     ui->clear_button->setHidden(true);
 
     set_items(today);
-    if(!is_burger_button_clicked)
-    {
-        ui->today_button->setText("DZISIAJ ("+QString::number(today.size())+")");
-        ui->all_button->setText("POZOSTAŁE ("+QString::number(rest.size())+")");
-        ui->week_button->setText("NASTĘPNY TYDZIEŃ ("+QString::number(next_week.size())+")");
-    }
+    set_number_in_sidebar();
 
 }
 
@@ -568,13 +569,7 @@ void MainWindow::update_vectors(std::string text, bool with_points)
 
     ui->rank_label->setText("Twoje Punkty: "+QString::number(points));
 
-    if(!is_burger_button_clicked)
-    {
-        ui->today_button->setText("DZISIAJ ("+QString::number(today.size())+")");
-        ui->all_button->setText("POZOSTAŁE ("+QString::number(rest.size())+")");
-        ui->week_button->setText("NASTĘPNY TYDZIEŃ ("+QString::number(next_week.size())+")");
-        ui->overdue_button->setText("ZALEGŁE ("+QString::number(overdue.size())+")");
-    }
+    set_number_in_sidebar();
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *key)
@@ -656,14 +651,7 @@ void MainWindow::set_items(std::vector<std::string> &vec)
      }
 
     check_emptiness(vec);
-
-    if(!is_burger_button_clicked)
-    {
-        ui->today_button->setText("DZISIAJ ("+QString::number(today.size())+")");
-        ui->all_button->setText("POZOSTAŁE ("+QString::number(rest.size())+")");
-        ui->week_button->setText("NASTĘPNY TYDZIEŃ ("+QString::number(next_week.size())+")");
-        ui->overdue_button->setText("ZALEGŁE ("+QString::number(overdue.size())+")");
-    }
+    set_number_in_sidebar();
 }
 
 void MainWindow::changeEvent(QEvent* e)
@@ -683,4 +671,15 @@ void MainWindow::changeEvent(QEvent* e)
     }
 
     QMainWindow::changeEvent(e);
+}
+
+void MainWindow::set_number_in_sidebar()
+{
+    if(!is_burger_button_clicked)
+    {
+        ui->today_button->setText("DZISIAJ ("+QString::number(today.size())+")");
+        ui->all_button->setText("POZOSTAŁE ("+QString::number(rest.size())+")");
+        ui->week_button->setText("NASTĘPNY TYDZIEŃ ("+QString::number(next_week.size())+")");
+        ui->overdue_button->setText("ZALEGŁE ("+QString::number(overdue.size())+")");
+    }
 }

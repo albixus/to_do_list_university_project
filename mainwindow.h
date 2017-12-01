@@ -111,8 +111,7 @@ private:
     void update_vectors(std::string text, bool with_points);
     void set_items(std::vector<std::string> &vec);
     void changeEvent(QEvent* event);
-
-
+    void set_number_in_sidebar();
 
 };
 
