@@ -13,7 +13,6 @@
 #include <vector>
 
 #include "add.h"
-#include "task.h"
 #include "accept.h"
 #include "stats.h"
 #include "edit_priority.h"

@@ -1,6 +1,5 @@
 #include "add.h"
 #include "ui_add.h"
-#include "task.h"
 #include <iostream>
 
 Add::Add(QWidget *parent) :

@@ -13,7 +13,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     initialize_tray();
-   QMessageBox::about(this,"ssS",qApp->applicationDirPath());
     sidebar_anim = new QPropertyAnimation(ui->sidebar,"minimumSize");
     sidebar_anim->setDuration(500);
 
@@ -22,8 +21,8 @@ MainWindow::MainWindow(QWidget *parent) :
     if(db.open())
     {
         QSqlQuery query;
-        if(!query.exec("CREATE TABLE tasks ("))
-
+        query.exec("CREATE TABLE \"tasks\" (\"ID_Task\" INTEGER PRIMARY KEY  NOT NULL ,\"Priority\" INTEGER NOT NULL ,"
+                       "\"Data\" DATETIME NOT NULL  DEFAULT (null) ,\"Text\" VARCHAR(100) NOT NULL ,\"Is_Done\" BOOL NOT NULL  DEFAULT (0))");
     }
 
     get_points_from_file("stats.tsk");
@@ -236,7 +235,7 @@ void MainWindow::on_task_list_itemChanged(QListWidgetItem *item)
                 {
                     QMessageBox::about(this,"Błąd","Błąd zapytania do bazy");
                 }
-
+            task_done_all++;
             update_vectors(item->text().toStdString(),true);
     }
 }
