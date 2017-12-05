@@ -8,6 +8,7 @@ namespace Ui {
 class Stats;
 }
 
+//window wich display your current statistics
 class Stats : public QWidget
 {
     Q_OBJECT

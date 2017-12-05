@@ -8,6 +8,7 @@ namespace Ui {
 class edit_date;
 }
 
+//edit date from context menu
 class edit_date : public QDialog
 {
     Q_OBJECT

@@ -10,6 +10,7 @@ namespace Ui {
 class Add;
 }
 
+//Adding task
 class Add : public QDialog
 {
     Q_OBJECT

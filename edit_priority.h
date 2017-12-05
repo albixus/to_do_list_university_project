@@ -9,6 +9,7 @@ namespace Ui {
 class Edit_priority;
 }
 
+//edit priority from context menu
 class Edit_priority : public QDialog
 {
     Q_OBJECT

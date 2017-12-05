@@ -8,6 +8,7 @@ namespace Ui {
 class Edit_text;
 }
 
+//editing text from context menu
 class Edit_text : public QDialog
 {
     Q_OBJECT

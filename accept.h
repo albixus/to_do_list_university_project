@@ -7,6 +7,7 @@ namespace Ui {
 class accept;
 }
 
+//dialog box - yes or no
 class accept : public QDialog
 {
     Q_OBJECT
